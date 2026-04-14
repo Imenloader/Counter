@@ -10,6 +10,7 @@ import JSZip from 'jszip';
  * Main Application Controller
  */
 async function init() {
+  console.log('TapCount: Initializing...');
   // Load saved state
   const savedState = await storage.get('tapcount_state', {
     value: 0,

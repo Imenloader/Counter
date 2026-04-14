@@ -1,11 +1,9 @@
-const CACHE_NAME = 'tapcount-v1.0.4';
+const CACHE_NAME = 'tapcount-v1.0.9';
 const ASSETS = [
   '/',
   '/index.html',
   '/manifest.json',
-  '/icon.svg',
-  '/_headers',
-  '/_redirects'
+  '/icon.svg'
 ];
 
 // During installation, cache the essential shell
@@ -36,20 +34,36 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// Network-first strategy for dynamic assets, cache-first for static
+// Network-first strategy for HTML, cache-first for other assets
 self.addEventListener('fetch', (event) => {
-  event.respondWith(
-    caches.match(event.request).then((response) => {
-      return response || fetch(event.request).then((networkResponse) => {
-        // Cache new assets on the fly if they are from our origin
-        if (event.request.url.startsWith(self.location.origin)) {
+  const isHtml = event.request.mode === 'navigate' || 
+                 event.request.url.endsWith('/') || 
+                 event.request.url.endsWith('index.html');
+
+  if (isHtml) {
+    event.respondWith(
+      fetch(event.request)
+        .then((networkResponse) => {
           return caches.open(CACHE_NAME).then((cache) => {
             cache.put(event.request, networkResponse.clone());
             return networkResponse;
           });
-        }
-        return networkResponse;
-      });
-    })
-  );
+        })
+        .catch(() => caches.match(event.request))
+    );
+  } else {
+    event.respondWith(
+      caches.match(event.request).then((response) => {
+        return response || fetch(event.request).then((networkResponse) => {
+          if (event.request.url.startsWith(self.location.origin)) {
+            return caches.open(CACHE_NAME).then((cache) => {
+              cache.put(event.request, networkResponse.clone());
+              return networkResponse;
+            });
+          }
+          return networkResponse;
+        });
+      })
+    );
+  }
 });

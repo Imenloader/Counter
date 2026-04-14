@@ -13,7 +13,7 @@
     <header class="z-50 flex h-16 items-center justify-between border-b border-white/5 bg-slate-900/80 px-8 backdrop-blur-lg">
       <div class="flex items-center gap-3">
         <div class="h-2.5 w-2.5 rounded-full bg-accent shadow-[0_0_12px_#38bdf8]"></div>
-        <h1 class="text-xl font-bold tracking-tight">TAPCOUNT <span class="ml-1 font-light opacity-50">v1.0.4</span></h1>
+        <h1 class="text-xl font-bold tracking-tight">TAPCOUNT <span class="ml-1 font-light opacity-50">v1.0.9</span></h1>
       </div>
       <div class="flex gap-6 text-xs font-semibold items-center">
         <span class="flex items-center gap-1.5 text-success">
@@ -158,6 +158,14 @@
     </footer>
 
     <script type="module" src="/src/main.js"></script>
+    <script>
+      // Force reload when Service Worker updates
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          window.location.reload();
+        });
+      }
+    </script>
   </body>
 </html>
 
