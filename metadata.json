@@ -1,0 +1,6 @@
+{
+  "name": "TapCount",
+  "description": "A hyper-lightweight, offline-first counter PWA and Browser Extension.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}

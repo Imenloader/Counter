@@ -1,0 +1,15 @@
+{
+  "manifest_version": 3,
+  "name": "TapCount",
+  "version": "1.0.0",
+  "description": "Minimalist offline counter",
+  "action": {
+    "default_popup": "index.html",
+    "default_icon": {
+      "16": "https://picsum.photos/seed/tapcount/16/16",
+      "48": "https://picsum.photos/seed/tapcount/48/48",
+      "128": "https://picsum.photos/seed/tapcount/128/128"
+    }
+  },
+  "permissions": ["storage"]
+}

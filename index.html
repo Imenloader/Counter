@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>TapCount</title>
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#000000" />
+    <link rel="apple-touch-icon" href="/icon-192.png" />
+  </head>
+  <body class="flex h-screen flex-col overflow-hidden antialiased transition-colors duration-300">
+    <!-- Header -->
+    <header class="z-50 flex h-16 items-center justify-between border-b border-white/5 bg-slate-900/80 px-8 backdrop-blur-lg">
+      <div class="flex items-center gap-3">
+        <div class="h-2.5 w-2.5 rounded-full bg-accent shadow-[0_0_12px_#38bdf8]"></div>
+        <h1 class="text-xl font-bold tracking-tight">TAPCOUNT <span class="ml-1 font-light opacity-50">v1.0.4</span></h1>
+      </div>
+      <div class="flex gap-6 text-xs font-semibold items-center">
+        <span class="flex items-center gap-1.5 text-success">
+          <span class="h-1.5 w-1.5 rounded-full bg-success"></span>
+          OFFLINE READY
+        </span>
+        <button id="reset-counter-header" class="text-accent hover:opacity-80 transition-opacity">RESET</button>
+        <button id="settings-toggle-header" class="p-2 bg-white/5 hover:bg-white/10 rounded-lg transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.72v-.51a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="relative flex flex-1 overflow-hidden">
+      <!-- Workspace -->
+      <div id="counter-workspace" class="relative flex flex-1 items-center justify-center bg-bg">
+        <!-- Exit Fullscreen Button (Hidden by default) -->
+        <button id="exit-fullscreen-btn" class="fixed top-6 right-6 z-50 hidden p-3 rounded-full bg-white/10 backdrop-blur-md border border-white/10 text-white hover:bg-white/20 transition-all active:scale-90">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M9 21H3v-6"/><path d="M21 3l-7 7"/><path d="M3 21l7-7"/></svg>
+        </button>
+
+        <div class="flex flex-col items-center">
+          <div id="tap-object" class="relative flex cursor-pointer items-center justify-center select-none shadow-[0_20px_50px_rgba(0,0,0,0.5)] transition-all duration-150 active:scale-95" style="width: 400px; height: 400px;">
+            <div class="flex flex-col items-center">
+              <span id="counter-display" class="font-extrabold tracking-tighter tabular-nums drop-shadow-2xl">0</span>
+              <span class="absolute bottom-8 text-[10px] font-bold uppercase tracking-[0.2em] text-accent opacity-80">Taps Recorded</span>
+            </div>
+            <!-- Pulse Effect -->
+            <div id="pulse-indicator" class="absolute inset-0 rounded-[inherit] border-2 border-accent opacity-0 scale-110 pointer-events-none"></div>
+          </div>
+          
+          <div class="mt-12 text-center">
+            <p class="text-sm text-text-muted">Tap anywhere on the object to increment</p>
+            <div class="mt-3 flex justify-center gap-5 text-[11px] font-medium">
+              <div><span class="text-text-muted">Step:</span> <span id="display-step">+1</span></div>
+              <div><span class="text-text-muted">Mode:</span> <span id="display-mode">Count Up</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Settings Sidebar (Drawer) -->
+      <aside id="settings-drawer" class="w-80 border-l border-white/5 bg-surface p-6 flex flex-col gap-8 overflow-y-auto transition-transform duration-300 fixed inset-y-0 right-0 z-40 translate-x-full shadow-2xl">
+        <div class="flex items-center justify-between">
+          <h2 class="text-lg font-bold">Settings</h2>
+          <button id="close-settings" class="p-2 hover:bg-white/5 rounded-full transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+          </button>
+        </div>
+
+        <!-- Configuration -->
+        <section class="flex flex-col gap-3">
+          <h3 class="text-[11px] font-bold uppercase tracking-wider text-text-muted">Configuration</h3>
+          <div class="control-row">
+            <span class="text-sm font-medium">Tap Mode</span>
+            <select id="tap-mode" class="bg-transparent text-sm font-bold text-accent outline-none">
+              <option value="up">Count Up</option>
+              <option value="down">Count Down</option>
+            </select>
+          </div>
+          <div class="control-row">
+            <span class="text-sm font-medium">Sound Effects</span>
+            <input type="checkbox" id="sound-toggle" class="accent-accent" checked>
+          </div>
+          <div class="control-row">
+            <span class="text-sm font-medium">Haptic Feedback</span>
+            <input type="checkbox" id="haptic-toggle" class="accent-accent" checked>
+          </div>
+          <button id="fullscreen-btn" class="mt-2 flex items-center justify-center gap-2 w-full py-2 rounded-xl bg-white/5 border border-white/10 text-sm font-semibold hover:bg-white/10 transition-all">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
+            Enter Fullscreen
+          </button>
+        </section>
+
+        <!-- Shape -->
+        <section class="flex flex-col gap-3">
+          <h3 class="text-[11px] font-bold uppercase tracking-wider text-text-muted">Shape</h3>
+          <div class="flex gap-2">
+            <button data-shape="square" class="shape-btn btn-small">Square</button>
+            <button data-shape="rounded" class="shape-btn btn-small active">Rounded</button>
+            <button data-shape="circle" class="shape-btn btn-small">Circle</button>
+          </div>
+        </section>
+
+        <!-- Step Size -->
+        <section class="flex flex-col gap-3">
+          <h3 class="text-[11px] font-bold uppercase tracking-wider text-text-muted">Step Size</h3>
+          <div class="flex flex-wrap gap-2">
+            <button data-step="1" class="step-btn btn-small active">1</button>
+            <button data-step="5" class="step-btn btn-small">5</button>
+            <button data-step="10" class="step-btn btn-small">10</button>
+            <button data-step="50" class="step-btn btn-small">50</button>
+          </div>
+          <input type="number" id="step-size" class="mt-1 w-full rounded-lg border border-white/10 bg-black/20 p-2 text-sm" value="1">
+        </section>
+
+        <!-- Appearance -->
+        <section class="flex flex-col gap-3">
+          <h3 class="text-[11px] font-bold uppercase tracking-wider text-text-muted">Appearance</h3>
+          <div class="space-y-4">
+            <div>
+              <label class="block text-[10px] mb-1.5 text-text-muted uppercase font-bold">Object Size</label>
+              <input type="range" id="object-size" min="50" max="500" value="400" class="w-full accent-accent">
+            </div>
+            <div class="grid grid-cols-3 gap-2">
+              <div>
+                <label class="block text-[9px] mb-1 text-text-muted">BG</label>
+                <input type="color" id="bg-color" class="w-full h-8 rounded-md cursor-pointer border-0 bg-transparent" value="#0f172a">
+              </div>
+              <div>
+                <label class="block text-[9px] mb-1 text-text-muted">OBJ</label>
+                <input type="color" id="obj-color" class="w-full h-8 rounded-md cursor-pointer border-0 bg-transparent" value="#1e293b">
+              </div>
+              <div>
+                <label class="block text-[9px] mb-1 text-text-muted">TEXT</label>
+                <input type="color" id="text-color" class="w-full h-8 rounded-md cursor-pointer border-0 bg-transparent" value="#f8fafc">
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Distribution -->
+        <section class="mt-auto p-5 rounded-2xl bg-accent/5 border border-accent/20">
+          <h3 class="text-[11px] font-bold uppercase tracking-wider text-accent mb-3">Unified Distribution</h3>
+          <button id="export-extension" class="w-full py-3 bg-accent text-bg font-bold rounded-xl text-sm hover:opacity-90 transition-all mb-3">Download .zip Extension</button>
+          <button id="install-btn" class="hidden w-full py-3 bg-white/5 border border-white/10 text-text-main font-semibold rounded-xl text-sm hover:bg-white/10 transition-all">Install PWA App</button>
+          <p class="text-[10px] text-text-muted mt-3 leading-relaxed">Export as Manifest V3 Extension for Chrome/Edge or install as standalone desktop app.</p>
+        </section>
+      </aside>
+
+      <!-- Mobile Toggle -->
+      <button id="settings-toggle" class="lg:hidden fixed bottom-6 right-6 z-50 h-14 w-14 rounded-full bg-accent text-bg shadow-xl flex items-center justify-center active:scale-90 transition-transform">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.72v-.51a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+      </button>
+    </main>
+
+    <!-- Footer -->
+    <footer class="h-12 border-t border-white/5 bg-bg px-8 flex items-center justify-between text-[11px] text-text-muted">
+      <div>Manifest V3 Powered &bull; Offline Persistent</div>
+      <div>&copy; 2026 TapCount Universal Systems</div>
+      <div>Local Storage: <span id="storage-usage">0.0</span>KB Used</div>
+    </footer>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
+
