@@ -4,7 +4,8 @@ const ASSETS = [
   '/index.html',
   '/manifest.json',
   '/icon.svg',
-  '/_headers'
+  '/_headers',
+  '/_redirects'
 ];
 
 // During installation, cache the essential shell
