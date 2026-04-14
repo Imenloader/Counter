@@ -105,6 +105,11 @@ async function exportExtension() {
   const manifest = await manifestRes.text();
   zip.file('manifest.json', manifest);
 
+  // Fetch icon
+  const iconRes = await fetch('/icon.svg');
+  const iconBlob = await iconRes.blob();
+  zip.file('icon.svg', iconBlob);
+
   // Fetch index.html and modify paths for extension
   const htmlRes = await fetch('/index.html');
   let html = await htmlRes.text();

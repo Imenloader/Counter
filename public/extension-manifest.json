@@ -5,11 +5,10 @@
   "description": "Minimalist offline counter",
   "action": {
     "default_popup": "index.html",
-    "default_icon": {
-      "16": "https://picsum.photos/seed/tapcount/16/16",
-      "48": "https://picsum.photos/seed/tapcount/48/48",
-      "128": "https://picsum.photos/seed/tapcount/128/128"
-    }
+    "default_icon": "icon.svg"
+  },
+  "icons": {
+    "128": "icon.svg"
   },
   "permissions": ["storage"]
 }
