@@ -1,9 +1,3 @@
 name = "tapcount"
+pages_build_output_dir = "dist"
 compatibility_date = "2024-04-01"
-
-[assets]
-directory = "./dist"
-
-[vars]
-# Add any environment variables here
-# GEMINI_API_KEY = "your-key-here"
