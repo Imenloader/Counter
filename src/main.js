@@ -4,7 +4,6 @@ import { Counter } from './counter.js';
 import { ui } from './ui.js';
 import { settings } from './settings.js';
 import { audio } from './audio.js';
-import JSZip from 'jszip';
 
 /**
  * Main Application Controller
@@ -26,7 +25,7 @@ async function init() {
   });
 
   const counter = new Counter(savedState);
-  
+
   // Initialize UI
   ui.updateDisplay(counter.value);
   ui.applyStyles(savedState);
@@ -37,11 +36,11 @@ async function init() {
     const newValue = counter.increment();
     ui.updateDisplay(newValue);
     ui.animateTap();
-    
+
     const state = settings.getState();
     if (state.sound) audio.playPop();
     if (state.haptic && navigator.vibrate) navigator.vibrate(10);
-    
+
     await storage.set('tapcount_state', { ...state, value: newValue });
     settings.updateStorageUsage();
   };
@@ -88,46 +87,19 @@ async function init() {
       deferredPrompt = null;
     }
   };
-
-  // Register Service Worker
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js');
-  }
 }
 
 /**
  * Export as Browser Extension
  */
-async function exportExtension() {
-  const zip = new JSZip();
-  
-  // Fetch extension manifest
-  const manifestRes = await fetch('/extension-manifest.json');
-  const manifest = await manifestRes.text();
-  zip.file('manifest.json', manifest);
-
-  // Fetch icon
-  const iconRes = await fetch('/icon.svg');
-  const iconBlob = await iconRes.blob();
-  zip.file('icon.svg', iconBlob);
-
-  // Fetch index.html and modify paths for extension
-  const htmlRes = await fetch('/index.html');
-  let html = await htmlRes.text();
-  // In a real build, we'd bundle CSS/JS. For this demo, we'll assume they are in the zip.
-  zip.file('index.html', html);
-
-  // Add JS files (simplified for this context)
-  // In a production app, you'd use a build tool to bundle these.
-  // Here we'll just alert that a full bundle requires a build step.
-  alert('Extension export initiated! In a production environment, this would bundle all compiled assets into the ZIP.');
-  
-  const content = await zip.generateAsync({ type: 'blob' });
-  const url = URL.createObjectURL(content);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'tapcount-extension.zip';
-  a.click();
+function exportExtension() {
+  alert(
+    "To install as a Chrome Extension:\n\n" +
+    "1. Run 'npm run build' in your terminal.\n" +
+    "2. Open Chrome and go to chrome://extensions\n" +
+    "3. Enable 'Developer mode' in the top right.\n" +
+    "4. Click 'Load unpacked' and select the generated 'dist' folder."
+  );
 }
 
 init();

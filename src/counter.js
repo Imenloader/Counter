@@ -3,9 +3,9 @@
  */
 export class Counter {
   constructor(state) {
-    this.value = state.value || 0;
-    this.step = state.step || 1;
-    this.mode = state.mode || 'up';
+    this.value = state.value ?? 0;
+    this.step = state.step ?? 1;
+    this.mode = state.mode ?? 'up';
   }
 
   increment() {
