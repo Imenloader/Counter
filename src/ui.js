@@ -47,10 +47,15 @@ export const ui = {
       document.querySelector('footer').classList.add('hidden');
       document.getElementById('settings-toggle').classList.add('hidden');
       
-      // Make object fill screen
-      const fsSize = Math.min(window.innerWidth, window.innerHeight) * 0.95;
-      obj.style.width = `${fsSize}px`;
-      obj.style.height = `${fsSize}px`;
+      // Make object fill screen entirely
+      obj.style.width = '100vw';
+      obj.style.height = '100vh';
+      obj.style.borderRadius = '0';
+      obj.style.borderWidth = '0';
+      obj.style.boxShadow = 'none';
+      
+      // Remove shape classes in fullscreen to ensure it fills corners
+      obj.classList.remove('rounded-none', 'rounded-[48px]', 'rounded-full');
     } else {
       document.body.classList.remove('is-fullscreen');
       document.getElementById('exit-fullscreen-btn').classList.add('hidden');
@@ -66,18 +71,19 @@ export const ui = {
 
       obj.style.width = `${finalSize}px`;
       obj.style.height = `${finalSize}px`;
+      obj.style.borderWidth = '2px';
+      obj.style.boxShadow = ''; // Reset to CSS default
+      
+      // Apply shape
+      obj.classList.remove('rounded-none', 'rounded-[48px]', 'rounded-full');
+      if (shape === 'square') obj.classList.add('rounded-none');
+      else if (shape === 'rounded') obj.classList.add('rounded-[48px]');
+      else if (shape === 'circle') obj.classList.add('rounded-full');
     }
 
     obj.style.background = `linear-gradient(135deg, ${objColor} 0%, #0f172a 100%)`;
     obj.style.color = textColor;
     obj.style.borderColor = 'var(--color-accent)';
-    obj.style.borderWidth = '2px';
-    
-    // Shape
-    obj.classList.remove('rounded-none', 'rounded-[48px]', 'rounded-full');
-    if (shape === 'square') obj.classList.add('rounded-none');
-    else if (shape === 'rounded') obj.classList.add('rounded-[48px]');
-    else if (shape === 'circle') obj.classList.add('rounded-full');
   },
 
   animateTap() {
