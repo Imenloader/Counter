@@ -1,23 +1,15 @@
 import tailwindcss from '@tailwindcss/vite';
 import path from 'path';
-import {defineConfig, loadEnv} from 'vite';
+import { defineConfig, loadEnv } from 'vite';
+import { VitePWA } from 'vite-plugin-pwa'; // <-- ADD THIS
 
 export default defineConfig(({mode}) => {
   const env = loadEnv(mode, '.', '');
   return {
-    plugins: [tailwindcss()],
-    define: {
-      'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY),
-    },
-    resolve: {
-      alias: {
-        '@': path.resolve(__dirname, '.'),
-      },
-    },
-    server: {
-      port: 3000,
-      host: '0.0.0.0',
-      hmr: process.env.DISABLE_HMR !== 'true',
-    },
+    plugins: [
+      tailwindcss(),
+      VitePWA({ registerType: 'autoUpdate' }) // <-- ADD THIS
+    ],
+    // ... rest of your config
   };
 });
